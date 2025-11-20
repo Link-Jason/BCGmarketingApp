@@ -1,0 +1,61 @@
+{
+  "items": [
+    {
+      "id": "espresso",
+      "name": "Signature Espresso",
+      "price": 4.5,
+      "cogs": 1.2,
+      "sales_current_period": 3200,
+      "sales_previous_period": 2800
+    },
+    {
+      "id": "cold-brew",
+      "name": "Nitro Cold Brew",
+      "price": 6.0,
+      "cogs": 2.1,
+      "sales_current_period": 1800,
+      "sales_previous_period": 1500
+    },
+    {
+      "id": "matcha",
+      "name": "Iced Matcha Latte",
+      "price": 6.75,
+      "cogs": 2.5,
+      "sales_current_period": 1400,
+      "sales_previous_period": 900
+    },
+    {
+      "id": "croissant",
+      "name": "Almond Croissant",
+      "price": 5.25,
+      "cogs": 1.8,
+      "sales_current_period": 950,
+      "sales_previous_period": 1100
+    },
+    {
+      "id": "sandwich",
+      "name": "Caprese Focaccia",
+      "price": 9.75,
+      "cogs": 4.2,
+      "sales_current_period": 1250,
+      "sales_previous_period": 1000
+    },
+    {
+      "id": "smoothie",
+      "name": "Sunrise Smoothie",
+      "price": 7.5,
+      "cogs": 3.1,
+      "sales_current_period": 700,
+      "sales_previous_period": 600
+    },
+    {
+      "id": "tea",
+      "name": "Herbal Wellness Tea",
+      "price": 4.0,
+      "cogs": 1.0,
+      "sales_current_period": 500,
+      "sales_previous_period": 650
+    }
+  ]
+}
+
