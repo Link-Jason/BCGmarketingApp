@@ -8,16 +8,23 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  ZAxis
+  ZAxis,
+  // 🚨 ADDED: ReferenceLine for quadrant thresholds
+  ReferenceLine,
 } from "recharts";
 
+// --- 1. CONFIGURATION AND THRESHOLDS ---
+const GROWTH_RATE_THRESHOLD = 0.15; // Y-axis
+const MENU_SHARE_THRESHOLD = 0.30; // X-axis
+
 const QUADRANT_COLOR = {
-  STAR: "#0ea5e9",
-  CASH_COW: "#22c55e",
-  QUESTION_MARK: "#f97316",
-  DOG: "#a1a1aa"
+  STAR: "#0ea5e9", // Sky Blue
+  CASH_COW: "#22c55e", // Emerald Green
+  QUESTION_MARK: "#f97316", // Orange
+  DOG: "#a1a1aa" // Gray
 };
 
+// --- 2. CUSTOM TOOLTIP ---
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
@@ -35,7 +42,10 @@ const CustomTooltip = ({ active, payload }) => {
   );
 };
 
+// --- 3. MAIN COMPONENT ---
 export default function MatrixChart({ data = [], onSelect, activeId }) {
+  
+  // Map data to include color and opacity for highlighting
   const chartData = data.map((item) => ({
     ...item,
     fill: QUADRANT_COLOR[item.quadrantKey] || "#94a3b8",
@@ -47,6 +57,37 @@ export default function MatrixChart({ data = [], onSelect, activeId }) {
       <ResponsiveContainer width="100%" height="100%">
         <ScatterChart margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" />
+          
+          {/* Vertical Line for Menu Share Threshold (X-Axis) */}
+          <ReferenceLine 
+            x={MENU_SHARE_THRESHOLD} 
+            stroke="#4b5563" 
+            strokeDasharray="5 5"
+            strokeWidth={1.5}
+            label={{ 
+                value: `${(MENU_SHARE_THRESHOLD * 100).toFixed(0)}% Share Threshold`, 
+                position: 'top', 
+                fill: '#4b5563', 
+                fontSize: 12,
+                dy: -10 
+            }}
+          />
+
+          {/* Horizontal Line for Growth Rate Threshold (Y-Axis) */}
+          <ReferenceLine 
+            y={GROWTH_RATE_THRESHOLD} 
+            stroke="#4b5563" 
+            strokeDasharray="5 5"
+            strokeWidth={1.5}
+            label={{ 
+                value: `${(GROWTH_RATE_THRESHOLD * 100).toFixed(0)}% Growth Threshold`, 
+                position: 'right', 
+                fill: '#4b5563', 
+                fontSize: 12,
+                dx: 5
+            }}
+          />
+
           <XAxis
             type="number"
             dataKey="menuShare"
