@@ -16,7 +16,7 @@ export default function Home() {
   const [selectedItem, setSelectedItem] = useState(null);
 
   // <--- ADDED: Process the raw data here before rendering the components
-  const processedData = buildMatrixDataset(dataFile.menuItems);
+  const processedData = buildMatrixDataset(dataFile.items);
 
   // The main content of the page
   return (
