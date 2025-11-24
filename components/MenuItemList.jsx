@@ -8,13 +8,34 @@ const borderColors = {
     'Dog': 'border-red-500',
 };
 
-// Map quadrant to recommended action
-const actionMap = {
-    'Star': 'Invest aggressively to maintain market share.',
-    'Cash Cow': 'Milk the profits with minimal investment.',
-    'Question Mark': 'Analyze closely; either invest to become a Star or divest.',
-    'Dog': 'Divest or phase out the product line.',
+// Map quadrant to the final, short, and actionable marketing prompts
+const MARKETING_ACTION_PROMPTS = {
+    'Star': {
+        // FINAL: Punchy Action (Keep momentum high)
+        action: 'Boost visibility with strong, consistent marketing while growth is hot.',
+        // FINAL: Simple Reason (Marketer language)
+        reason: 'Customers already want it — keep the momentum high.',
+    },
+    'Cash Cow': {
+        // FINAL: Focus on efficiency and loyalty protection
+        action: 'Keep marketing light but steady—protect loyalty and let it earn.',
+        // FINAL: Simple Reason (Marketer language)
+        reason: 'It performs well without heavy promotion.',
+    },
+    'Question Mark': {
+        // FINAL: Emphasis on testing before commitment
+        action: 'Test small campaigns first. Scale only if results prove demand.',
+        // FINAL: Simple Reason (Marketer language)
+        reason: 'It might win big, or flop — validate before investing.',
+    },
+    'Dog': {
+        // FINAL: Focus on resource allocation
+        action: 'Limit marketing; focus budget where it can make real impact.',
+        // FINAL: Simple Reason (Marketer language)
+        reason: 'Low growth and low demand give weak returns.',
+    },
 };
+
 
 const MenuItemList = ({ items, onSelect, selectedId }) => {
     if (!items || items.length === 0) {
@@ -28,20 +49,21 @@ const MenuItemList = ({ items, onSelect, selectedId }) => {
     return (
         <div className="mb-8">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Menu Item List ({items.length})
+                Menu Items ({items.length})
             </h3>
             <div className="max-h-[400px] overflow-y-auto space-y-2 pr-2">
                 {items.map((item) => (
                     <div
                         key={item.name}
                         onClick={() => onSelect(item)}
+                        // Keep border for quadrant visual cue and highlight selection
                         className={`p-3 border-l-4 rounded-md cursor-pointer transition-all duration-150 shadow-sm 
                             ${borderColors[item.classification]} 
                             ${selectedId === item.name ? 'bg-indigo-50 ring-2 ring-indigo-500' : 'bg-white hover:bg-gray-50'}`}
                     >
-                        <p className="font-semibold text-gray-900">{item.name}</p>
-                        <p className={`text-sm font-medium ${selectedId === item.name ? 'text-indigo-600' : 'text-gray-500'}`}>
-                            {item.classification}
+                        {/* Simple List Format: [Name] - [Quadrant] */}
+                        <p className="font-semibold text-gray-900">
+                            {item.name} <span className="text-sm font-medium text-gray-500"> — {item.classification}</span>
                         </p>
                     </div>
                 ))}
@@ -52,4 +74,5 @@ const MenuItemList = ({ items, onSelect, selectedId }) => {
 
 export default MenuItemList;
 
-export { actionMap };
+// Export map for use in OutputPanel
+export { MARKETING_ACTION_PROMPTS };

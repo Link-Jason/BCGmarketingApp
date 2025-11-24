@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Define colors and recommended action for the bubbles
+// Define colors for the bubbles
 const classificationColors = {
   'Star': { class: 'bg-green-500 hover:bg-green-600', text: 'Stars' },
   'Cash Cow': { class: 'bg-blue-500 hover:bg-blue-600', text: 'Cash Cows' },
@@ -18,30 +18,32 @@ const getSizeClass = (size) => {
 };
 
 // Component for a single, positioned data bubble
-// Added onSelect prop
 const DataBubble = ({ item, onSelect, selected }) => {
   const sizeClass = getSizeClass(item.size);
 
+  // CRITICAL FIX: Clamp x and y between 0.1 and 99.9% to prevent bubbles from spilling outside the chart boundaries.
+  const clampedX = Math.max(0.1, Math.min(99.9, item.x)); 
+  const clampedY = Math.max(0.1, Math.min(99.9, item.y)); 
+
   // Calculate position: X is straight percentage, Y is inverted (CSS 0% is top of the relative container)
-  const leftPosition = `${item.x}%`; 
-  const bottomPosition = `${item.y}%`; 
+  const leftPosition = `${clampedX}%`; 
+  const bottomPosition = `${clampedY}%`; 
 
   return (
     <div
       onClick={() => onSelect(item)} // Handle click
       className={`absolute rounded-full shadow-lg transition-all duration-300 transform -translate-x-1/2 -translate-y-1/2 
-        ${classificationColors[item.classification].class} ${sizeClass} cursor-pointer opacity-75
-        ${selected ? 'ring-4 ring-offset-2 ring-indigo-500 z-10' : 'ring-4 ring-white'}`} // Highlight selection
+        ${classificationColors[item.classification].class} ${sizeClass} cursor-pointer opacity-80 border-2 border-white
+        ${selected ? 'ring-4 ring-offset-2 ring-indigo-500 z-10' : 'hover:opacity-100 hover:scale-110'}`} // Highlight selection
       style={{ left: leftPosition, bottom: bottomPosition }}
       // Use the 'title' attribute for a tooltip on hover
-      title={`${item.name} (${item.classification}) - Share: ${item.x.toFixed(1)}%, Growth: ${item.y.toFixed(1)}%, Revenue: $${item.revenue.toLocaleString()}`}
+      title={`${item.name} (${item.classification}) - Share: ${item.x.toFixed(1)}%, Growth: ${item.y.toFixed(1)}%`}
     >
     </div>
   );
 };
 
 // Main BCG Matrix Chart Component
-// Added onSelect and selectedItem props
 const MatrixChart = ({ data, onSelect, selectedItem }) => {
   if (!data || data.length === 0) {
     return (
@@ -61,13 +63,13 @@ const MatrixChart = ({ data, onSelect, selectedItem }) => {
             {/* Quadrant Backgrounds (50% x 50% areas) */}
             
             {/* Top-Right (Star: High Share, High Growth) */}
-            <div className="absolute w-1/2 h-1/2 bottom-1/2 right-0 bg-green-50 opacity-50"></div>
+            <div className="absolute w-1/2 h-1/2 bottom-1/2 right-0 bg-green-50 opacity-40"></div>
             {/* Top-Left (Question Mark: Low Share, High Growth) */}
-            <div className="absolute w-1/2 h-1/2 bottom-1/2 left-0 bg-yellow-50 opacity-50"></div>
+            <div className="absolute w-1/2 h-1/2 bottom-1/2 left-0 bg-yellow-50 opacity-40"></div>
             {/* Bottom-Right (Cash Cow: High Share, Low Growth) */}
-            <div className="absolute w-1/2 h-1/2 top-1/2 right-0 bg-blue-50 opacity-50"></div>
+            <div className="absolute w-1/2 h-1/2 top-1/2 right-0 bg-blue-50 opacity-40"></div>
             {/* Bottom-Left (Dog: Low Share, Low Growth) */}
-            <div className="absolute w-1/2 h-1/2 top-1/2 left-0 bg-red-50 opacity-50"></div>
+            <div className="absolute w-1/2 h-1/2 top-1/2 left-0 bg-red-50 opacity-40"></div>
             
             {/* Axes Lines (50% threshold) */}
             <div className="absolute w-full h-0.5 bg-gray-600 top-1/2 transform -translate-y-1/2"></div>
@@ -83,12 +85,12 @@ const MatrixChart = ({ data, onSelect, selectedItem }) => {
                 />
             ))}
 
-            {/* Quadrant Labels - Fixed absolute positioning */}
+            {/* Quadrant Labels - Fixed absolute positioning and improved styling */}
             <div className="absolute top-0 left-0 w-full h-full p-4 pointer-events-none">
-                <span className="absolute top-2 left-2 text-xl text-yellow-800 font-bold">Question Marks</span>
-                <span className="absolute top-2 right-2 text-xl text-green-800 font-bold">Stars</span>
-                <span className="absolute bottom-2 left-2 text-xl text-red-800 font-bold">Dogs</span>
-                <span className="absolute bottom-2 right-2 text-xl text-blue-800 font-bold">Cash Cows</span>
+                <span className="absolute top-2 left-2 text-2xl text-yellow-800 font-extrabold opacity-75">Question Marks</span>
+                <span className="absolute top-2 right-2 text-2xl text-green-800 font-extrabold opacity-75">Stars</span>
+                <span className="absolute bottom-2 left-2 text-2xl text-red-800 font-extrabold opacity-75">Dogs</span>
+                <span className="absolute bottom-2 right-2 text-2xl text-blue-800 font-extrabold opacity-75">Cash Cows</span>
             </div>
             
             {/* X-Axis Label (Bottom) */}
