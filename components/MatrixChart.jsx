@@ -1,21 +1,25 @@
 import React from 'react';
 
-// Define colors for the bubbles
+// Define colors and recommended action for the bubbles
 const classificationColors = {
-  'Star': 'bg-green-500 hover:bg-green-600',
-  'Cash Cow': 'bg-blue-500 hover:bg-blue-600',
-  'Question Mark': 'bg-yellow-500 hover:bg-yellow-600',
-  'Dog': 'bg-red-500 hover:bg-red-600',
+  'Star': { class: 'bg-green-500 hover:bg-green-600', text: 'Stars' },
+  'Cash Cow': { class: 'bg-blue-500 hover:bg-blue-600', text: 'Cash Cows' },
+  'Question Mark': { class: 'bg-yellow-500 hover:bg-yellow-600', text: 'Question Marks' },
+  'Dog': { class: 'bg-red-500 hover:bg-red-600', text: 'Dogs' },
+};
+
+// Map calculated size (0-100) to standard Tailwind size classes for safety
+const getSizeClass = (size) => {
+    if (size >= 80) return 'h-20 w-20'; // max size
+    if (size >= 60) return 'h-16 w-16';
+    if (size >= 40) return 'h-12 w-12';
+    if (size >= 20) return 'h-8 w-8'; // min size
+    return 'h-6 w-6';
 };
 
 // Component for a single, positioned data bubble
 const DataBubble = ({ item }) => {
-  // Use the calculated size (0-100) to map to a reasonable pixel size range
-  // Minimum size 32px (h-8/w-8) to maximum 80px (h-20/w-20)
-  const baseSize = 8; 
-  // Custom size calculation to map the 0-100 scale to pixel dimensions for Tailwind JIT
-  const pixelSize = baseSize + (item.size / 100) * (20 - baseSize); 
-  const sizeClass = `h-[${pixelSize}px] w-[${pixelSize}px]`;
+  const sizeClass = getSizeClass(item.size);
 
   // Calculate position: X is straight percentage, Y is inverted (CSS 0% is top of the relative container)
   const leftPosition = `${item.x}%`; 
@@ -24,12 +28,11 @@ const DataBubble = ({ item }) => {
   return (
     <div
       className={`absolute rounded-full shadow-lg transition-all duration-300 transform -translate-x-1/2 -translate-y-1/2 
-        ${classificationColors[item.classification]} ${sizeClass} cursor-pointer opacity-75 ring-4 ring-white`}
+        ${classificationColors[item.classification].class} ${sizeClass} cursor-pointer opacity-75 ring-4 ring-white`}
       style={{ left: leftPosition, bottom: bottomPosition }}
       // Use the 'title' attribute for a tooltip on hover
       title={`${item.name} (${item.classification}) - Share: ${item.x.toFixed(1)}%, Growth: ${item.y.toFixed(1)}%, Revenue: $${item.revenue.toLocaleString()}`}
     >
-      {/* Bubble text could go here if needed, but the title attribute handles tooltips simply */}
     </div>
   );
 };
@@ -71,12 +74,12 @@ const MatrixChart = ({ data }) => {
                 <DataBubble key={index} item={item} />
             ))}
 
-            {/* Quadrant Labels */}
-            <div className="absolute text-center p-2 text-gray-800 font-bold text-lg pointer-events-none">
-                <span className="absolute top-2 left-2 text-xl text-yellow-800">Question Marks</span>
-                <span className="absolute top-2 right-2 text-xl text-green-800">Stars</span>
-                <span className="absolute bottom-2 left-2 text-xl text-red-800">Dogs</span>
-                <span className="absolute bottom-2 right-2 text-xl text-blue-800">Cash Cows</span>
+            {/* Quadrant Labels - Fixed absolute positioning */}
+            <div className="absolute top-0 left-0 w-full h-full p-4 pointer-events-none">
+                <span className="absolute top-2 left-2 text-xl text-yellow-800 font-bold">Question Marks</span>
+                <span className="absolute top-2 right-2 text-xl text-green-800 font-bold">Stars</span>
+                <span className="absolute bottom-2 left-2 text-xl text-red-800 font-bold">Dogs</span>
+                <span className="absolute bottom-2 right-2 text-xl text-blue-800 font-bold">Cash Cows</span>
             </div>
             
             {/* X-Axis Label (Bottom) */}
@@ -96,8 +99,8 @@ const MatrixChart = ({ data }) => {
         <div className="mt-12 p-4 border rounded-lg shadow-sm bg-white grid grid-cols-2 gap-4 text-center w-full max-w-md">
             {Object.keys(classificationColors).map(key => (
                 <div key={key} className="flex items-center space-x-2 justify-center">
-                    <div className={`h-4 w-4 rounded-full ${classificationColors[key]} opacity-75`}></div>
-                    <span className="font-medium text-gray-700">{key}</span>
+                    <div className={`h-4 w-4 rounded-full ${classificationColors[key].class} opacity-75`}></div>
+                    <span className="font-medium text-gray-700">{classificationColors[key].text}</span>
                 </div>
             ))}
         </div>
