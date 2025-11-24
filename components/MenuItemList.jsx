@@ -1,6 +1,6 @@
 import React from 'react';
-// Import centralized data from the new file
-import { borderColors } from '../data/marketingPrompts';
+// This import is now correct because you renamed the data file to MarketingPrompts.js
+import { borderColors } from '../data/MarketingPrompts.js';
 
 const MenuItemList = ({ items, onSelect, selectedId }) => {
     if (!items || items.length === 0) {

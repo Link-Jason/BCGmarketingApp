@@ -1,6 +1,6 @@
 import React from 'react';
-// Import centralized data from the new file
-import { MARKETING_ACTION_PROMPTS } from '../data/marketingPrompts';
+// This import is now correct because you renamed the data file to MarketingPrompts.js
+import { MARKETING_ACTION_PROMPTS } from '../data/MarketingPrompts.js';
 
 const OutputPanel = ({ selectedItem }) => {
     if (!selectedItem) {
@@ -14,9 +14,10 @@ const OutputPanel = ({ selectedItem }) => {
         );
     }
 
+    // Destructure properties from the selected item
     const { name, classification, x, y, margin } = selectedItem;
     
-    // Get the structured marketing advice object
+    // Get the structured marketing advice object using the classification
     const prompt = MARKETING_ACTION_PROMPTS[classification] || { action: "N/A", reason: "N/A" };
 
     return (
