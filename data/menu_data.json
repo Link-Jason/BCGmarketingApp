@@ -1,61 +1,40 @@
 {
+  "description": "Menu data for BCG Matrix analysis. Items are labeled with expected quadrant for easy verification.",
   "items": [
     {
-      "id": "espresso",
-      "name": "Signature Espresso",
-      "price": 4.5,
-      "cogs": 1.2,
-      "sales_current_period": 3200,
-      "sales_previous_period": 2800
+      "item_name": "Espresso Shot (Dog)",
+      "revenue": 500.00,
+      "volume": 500
     },
     {
-      "id": "cold-brew",
-      "name": "Nitro Cold Brew",
-      "price": 6.0,
-      "cogs": 2.1,
-      "sales_current_period": 1800,
-      "sales_previous_period": 1500
+      "item_name": "House Blend Coffee (Cash Cow)",
+      "revenue": 15000.00,
+      "volume": 1500
     },
     {
-      "id": "matcha",
-      "name": "Iced Matcha Latte",
-      "price": 6.75,
-      "cogs": 2.5,
-      "sales_current_period": 1400,
-      "sales_previous_period": 900
+      "item_name": "Seasonal Latte (Star)",
+      "revenue": 10000.00,
+      "volume": 3500
     },
     {
-      "id": "croissant",
-      "name": "Almond Croissant",
-      "price": 5.25,
-      "cogs": 1.8,
-      "sales_current_period": 950,
-      "sales_previous_period": 1100
+      "item_name": "Breakfast Muffin (Dog)",
+      "revenue": 2000.00,
+      "volume": 500
     },
     {
-      "id": "sandwich",
-      "name": "Caprese Focaccia",
-      "price": 9.75,
-      "cogs": 4.2,
-      "sales_current_period": 1250,
-      "sales_previous_period": 1000
+      "item_name": "Signature Sandwich (Cash Cow)",
+      "revenue": 10000.00,
+      "volume": 1200
     },
     {
-      "id": "smoothie",
-      "name": "Sunrise Smoothie",
-      "price": 7.5,
-      "cogs": 3.1,
-      "sales_current_period": 700,
-      "sales_previous_period": 600
+      "item_name": "Cold Brew (Question Mark)",
+      "revenue": 4000.00,
+      "volume": 2500
     },
     {
-      "id": "tea",
-      "name": "Herbal Wellness Tea",
-      "price": 4.0,
-      "cogs": 1.0,
-      "sales_current_period": 500,
-      "sales_previous_period": 650
+      "item_name": "Breakfast Burrito (Question Mark)",
+      "revenue": 3000.00,
+      "volume": 3000
     }
   ]
 }
-
