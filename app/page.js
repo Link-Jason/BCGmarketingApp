@@ -1,73 +1,113 @@
-'use client'; 
+'use client';
 
-// Import useState (needed for interactivity)
-import { useState } from 'react'; 
-import { buildMatrixDataset } from '../lib/calculations';
-import MatrixChart from '../components/MatrixChart'; 
-import MenuItemList from '../components/MenuItemList'; 
-import OutputPanel from '../components/OutputPanel'; 
-import menuData from '../data/menu_data.json'; 
+import { useState, useEffect } from 'react';
+// Import the components and add the .jsx extension
+import MatrixChart from '../components/MatrixChart.jsx';
+import MenuItemList from '../components/MenuItemList.jsx';
+import OutputPanel from '../components/OutputPanel.jsx';
 
-// --- ROBUST DATA EXTRACTION LOGIC ---
-let rawItems;
-// Safely extract the item array from the imported JSON
-if (menuData && menuData.items && Array.isArray(menuData.items)) {
-    rawItems = menuData.items;
-} else if (Array.isArray(menuData)) {
-    rawItems = menuData;
-} else if (menuData && menuData.data && Array.isArray(menuData.data)) {
-    rawItems = menuData.data;
-} else {
-    console.error("Could not find the array of menu items in menu_data.json. Check the JSON structure.");
-    rawItems = [];
-}
-// --- END DATA EXTRACTION ---
+// Import raw data and ensure .js extension
+import { MENU_ITEMS } from '../data/MenuData.js';
 
-// Process the safely extracted array of items
-const PROCESSED_DATA = buildMatrixDataset(rawItems);
 
-export default function App() {
-  // State to hold the item currently selected on the chart or list
-  const [selectedItem, setSelectedItem] = useState(null); 
-  
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
-      <header className="mb-8 text-center">
-        <h1 className="text-4xl font-extrabold text-indigo-700 mb-2">BCG Matrix Dashboard</h1>
-        <p className="text-xl text-gray-500">Strategic Portfolio Analysis for Menu Items</p>
-      </header>
+/**
+ * Calculates the BCG Classification for a single menu item.
+ * Classification is based on Relative Market Share (X) and Market Growth Rate (Y).
+ * X > 50% AND Y > 50% => Star
+ * X > 50% AND Y <= 50% => Cash Cow
+ * X <= 50% AND Y > 50% => Question Mark
+ * X <= 50% AND Y <= 50% => Dog
+ */
+const classifyItem = (item) => {
+    // Check if item has the necessary properties before comparison
+    if (item.x == null || item.y == null) {
+        return 'Unknown';
+    }
+    
+    const isHighShare = item.x > 50;
+    const isHighGrowth = item.y > 50;
 
-      <main className="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-6 grid lg:grid-cols-3 gap-8">
-        
-        {/* BCG Chart Area (takes 2/3 width on large screens) */}
-        <div className="lg:col-span-2 flex flex-col items-center">
-            {/* PASS THE SETTER FUNCTION to MatrixChart */}
-            <MatrixChart 
-                data={PROCESSED_DATA} 
-                onSelect={setSelectedItem}
-                selectedItem={selectedItem}
-            />
-            <div className="mt-12 w-full text-center text-gray-500 text-sm italic">
-                Bubble size reflects absolute revenue. X-axis is Relative Market Share (Revenue), Y-axis is Market Growth Rate (Volume).
+    if (isHighShare && isHighGrowth) return 'Star';
+    if (isHighShare && !isHighGrowth) return 'Cash Cow';
+    if (!isHighShare && isHighGrowth) return 'Question Mark';
+    return 'Dog'; // Dog
+};
+
+
+/**
+ * Main application component for the BCG Marketing Dashboard.
+ */
+export default function Home() {
+    // FIX: Initialize menuItems state to an EMPTY ARRAY [] to prevent the .map() error during build/prerender.
+    const [menuItems, setMenuItems] = useState([]);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        // Simple client-side data simulation
+        const calculatedItems = MENU_ITEMS.map(item => ({
+            ...item,
+            // Calculate classification based on the raw x/y values
+            classification: classifyItem(item),
+        }));
+
+        setMenuItems(calculatedItems);
+        setIsLoading(false);
+        // Automatically select the first item if data exists
+        if (calculatedItems.length > 0) {
+            setSelectedItem(calculatedItems[0]);
+        }
+    }, []);
+
+    const handleSelectItem = (item) => {
+        setSelectedItem(item);
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <p className="text-xl font-medium text-indigo-600">Loading BCG Data...</p>
             </div>
-        </div>
+        );
+    }
 
-        {/* Side Panel for List/Recommendations (takes 1/3 width) */}
-        <div className="lg:col-span-1 border-l pl-6 border-gray-200">
-            {/* Use the correct prop name: items, not data */}
-            <MenuItemList 
-                items={PROCESSED_DATA} 
-                onSelect={setSelectedItem}
-                selectedId={selectedItem ? selectedItem.name : null}
-            />
-            <OutputPanel selectedItem={selectedItem} />
-        </div>
+    return (
+        <main className="min-h-screen bg-gray-50 p-4 sm:p-8">
+            <header className="text-center mb-8">
+                <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+                    BCG Marketing Strategy Dashboard
+                </h1>
+                <p className="text-lg text-gray-600">
+                    Analyze menu item portfolio using the Growth-Share Matrix.
+                </p>
+            </header>
 
-      </main>
+            <div className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto">
+                {/* Left Column: Matrix Chart and Menu List */}
+                <div className="w-full lg:w-2/3 flex flex-col gap-8">
+                    <MatrixChart 
+                        items={menuItems} // Now guaranteed to be an array []
+                        onSelect={handleSelectItem}
+                        selectedId={selectedItem ? selectedItem.name : null}
+                    />
+                    <div className="bg-white p-6 rounded-lg shadow-xl ring-1 ring-gray-100">
+                        <MenuItemList
+                            items={menuItems} // Now guaranteed to be an array []
+                            onSelect={handleSelectItem}
+                            selectedId={selectedItem ? selectedItem.name : null}
+                        />
+                    </div>
+                </div>
 
-      <footer className="mt-8 text-center text-sm text-gray-400">
-        © 2024 BCG Matrix Analyzer | Data analysis powered by local calculation engine.
-      </footer>
-    </div>
-  );
+                {/* Right Column: Output Panel */}
+                <div className="w-full lg:w-1/3 sticky top-8 h-fit">
+                    <OutputPanel selectedItem={selectedItem} />
+                </div>
+            </div>
+            
+            <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
+                Data generated for demonstration purposes.
+            </footer>
+        </main>
+    );
 }
