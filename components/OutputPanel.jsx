@@ -20,42 +20,41 @@ const OutputPanel = ({ selectedItem }) => {
 
     return (
         <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-lg">
-            <h3 className="text-2xl font-bold text-gray-800 mb-3">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
                 {name}
             </h3>
             
-            {/* Quadrant Label */}
-            <p className="text-lg mb-6">
-                <span className="font-semibold text-gray-600">Quadrant:</span> 
-                <span className={`ml-2 px-3 py-1 rounded-full text-sm font-bold 
-                    ${classification === 'Star' ? 'bg-green-100 text-green-700' : 
-                      classification === 'Cash Cow' ? 'bg-blue-100 text-blue-700' : 
-                      classification === 'Question Mark' ? 'bg-yellow-100 text-yellow-700' : 
-                      'bg-red-100 text-red-700'}`}>
-                    {classification}
-                </span>
-            </p>
+            {/* Quadrant Label - HIGH VISIBILITY HEADER */}
+            <div className={`p-3 rounded-lg mb-6 shadow-md
+                ${classification === 'Star' ? 'bg-green-500' : 
+                  classification === 'Cash Cow' ? 'bg-blue-500' : 
+                  classification === 'Question Mark' ? 'bg-yellow-500' : 
+                  'bg-red-500'}`}>
+                <p className="font-bold text-xl text-white">
+                    {classification} Quadrant
+                </p>
+            </div>
 
-            {/* Action Prompt */}
-            <div className="pt-4 border-t border-indigo-100">
+            {/* Action Prompt - FRONT & CENTER */}
+            <div className="pt-2 border-t border-indigo-100">
                 <h4 className="font-bold text-xl text-indigo-700 mb-2 flex items-center">
-                    <span className="text-2xl mr-2">🔥</span> What you should do next
+                    <span className="text-2xl mr-2">🔥</span> Immediate Action
                 </h4>
-                {/* Action text is the most prominent element */}
-                <p className="text-gray-700 text-xl mb-4 leading-snug font-extrabold">
+                {/* Action text is now LARGER and most prominent */}
+                <p className="text-gray-900 text-2xl mb-4 leading-snug font-extrabold">
                     {prompt.action}
                 </p>
 
                 <h4 className="font-bold text-lg text-indigo-700 mb-2 flex items-center">
-                    <span className="text-xl mr-2">💡</span> Why it matters
+                    <span className="text-xl mr-2">💡</span> Why it Matters
                 </h4>
-                <p className="text-gray-600 text-base italic leading-relaxed border-b pb-4">
+                <p className="text-gray-600 text-base italic leading-relaxed pb-4">
                     {prompt.reason}
                 </p>
             </div>
             
-            {/* Key Metrics */}
-            <div className="mt-4">
+            {/* Key Metrics - Moved to the bottom */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
                 <h4 className="font-bold text-lg text-gray-700 mb-2">📊 Key Metrics</h4>
                 <div className="space-y-1 text-base">
                     <p><span className="font-semibold text-gray-600">Market Growth:</span> {y.toFixed(1)}%</p>

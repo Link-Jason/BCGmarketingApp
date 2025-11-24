@@ -21,9 +21,10 @@ const getSizeClass = (size) => {
 const DataBubble = ({ item, onSelect, selected }) => {
   const sizeClass = getSizeClass(item.size);
 
-  // CRITICAL FIX: Clamp x and y between 0.1 and 99.9% to prevent bubbles from spilling outside the chart boundaries.
-  const clampedX = Math.max(0.1, Math.min(99.9, item.x)); 
-  const clampedY = Math.max(0.1, Math.min(99.9, item.y)); 
+  // CRITICAL FIX: Clamp x and y between 5% and 95% to prevent the radius of the largest bubble from spilling 
+  // outside the chart boundaries.
+  const clampedX = Math.max(5, Math.min(95, item.x)); 
+  const clampedY = Math.max(5, Math.min(95, item.y)); 
 
   // Calculate position: X is straight percentage, Y is inverted (CSS 0% is top of the relative container)
   const leftPosition = `${clampedX}%`; 

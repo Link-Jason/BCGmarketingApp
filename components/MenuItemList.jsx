@@ -11,27 +11,19 @@ const borderColors = {
 // Map quadrant to the final, short, and actionable marketing prompts
 const MARKETING_ACTION_PROMPTS = {
     'Star': {
-        // FINAL: Punchy Action (Keep momentum high)
         action: 'Boost visibility with strong, consistent marketing while growth is hot.',
-        // FINAL: Simple Reason (Marketer language)
         reason: 'Customers already want it — keep the momentum high.',
     },
     'Cash Cow': {
-        // FINAL: Focus on efficiency and loyalty protection
         action: 'Keep marketing light but steady—protect loyalty and let it earn.',
-        // FINAL: Simple Reason (Marketer language)
         reason: 'It performs well without heavy promotion.',
     },
     'Question Mark': {
-        // FINAL: Emphasis on testing before commitment
         action: 'Test small campaigns first. Scale only if results prove demand.',
-        // FINAL: Simple Reason (Marketer language)
         reason: 'It might win big, or flop — validate before investing.',
     },
     'Dog': {
-        // FINAL: Focus on resource allocation
         action: 'Limit marketing; focus budget where it can make real impact.',
-        // FINAL: Simple Reason (Marketer language)
         reason: 'Low growth and low demand give weak returns.',
     },
 };
