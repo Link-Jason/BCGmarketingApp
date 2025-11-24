@@ -1,5 +1,6 @@
 import React from 'react';
-import { MARKETING_ACTION_PROMPTS } from './MenuItemList'; // Import the new action map
+// Import centralized data from the new file
+import { MARKETING_ACTION_PROMPTS } from '../data/marketingPrompts';
 
 const OutputPanel = ({ selectedItem }) => {
     if (!selectedItem) {
@@ -48,6 +49,7 @@ const OutputPanel = ({ selectedItem }) => {
                 <h4 className="font-bold text-lg text-indigo-700 mb-2 flex items-center">
                     <span className="text-xl mr-2">💡</span> Why it Matters
                 </h4>
+                {/* This is the refined, operator-friendly reason */}
                 <p className="text-gray-600 text-base italic leading-relaxed pb-4">
                     {prompt.reason}
                 </p>

@@ -1,33 +1,6 @@
 import React from 'react';
-
-// Define the colors for the list borders
-const borderColors = {
-    'Star': 'border-green-500',
-    'Cash Cow': 'border-blue-500',
-    'Question Mark': 'border-yellow-500',
-    'Dog': 'border-red-500',
-};
-
-// Map quadrant to the final, short, and actionable marketing prompts
-const MARKETING_ACTION_PROMPTS = {
-    'Star': {
-        action: 'Boost visibility with strong, consistent marketing while growth is hot.',
-        reason: 'Customers already want it — keep the momentum high.',
-    },
-    'Cash Cow': {
-        action: 'Keep marketing light but steady—protect loyalty and let it earn.',
-        reason: 'It performs well without heavy promotion.',
-    },
-    'Question Mark': {
-        action: 'Test small campaigns first. Scale only if results prove demand.',
-        reason: 'It might win big, or flop — validate before investing.',
-    },
-    'Dog': {
-        action: 'Limit marketing; focus budget where it can make real impact.',
-        reason: 'Low growth and low demand give weak returns.',
-    },
-};
-
+// Import centralized data from the new file
+import { borderColors } from '../data/marketingPrompts';
 
 const MenuItemList = ({ items, onSelect, selectedId }) => {
     if (!items || items.length === 0) {
@@ -48,7 +21,7 @@ const MenuItemList = ({ items, onSelect, selectedId }) => {
                     <div
                         key={item.name}
                         onClick={() => onSelect(item)}
-                        // Keep border for quadrant visual cue and highlight selection
+                        // Use imported borderColors
                         className={`p-3 border-l-4 rounded-md cursor-pointer transition-all duration-150 shadow-sm 
                             ${borderColors[item.classification]} 
                             ${selectedId === item.name ? 'bg-indigo-50 ring-2 ring-indigo-500' : 'bg-white hover:bg-gray-50'}`}
@@ -65,6 +38,3 @@ const MenuItemList = ({ items, onSelect, selectedId }) => {
 };
 
 export default MenuItemList;
-
-// Export map for use in OutputPanel
-export { MARKETING_ACTION_PROMPTS };
