@@ -1,72 +1,71 @@
-'use client'; // This is a Client Component because it uses useState and handles user interaction
+'use client'; 
 
-import { useState } from 'react';
-
-// --- COMPONENT IMPORTS (FIX for 'is not defined' error) ---
-// Assuming your components are in a folder named 'components'
-import MatrixChart from '../components/MatrixChart'; 
-import OutputPanel from '../components/OutputPanel';
-import MenuItemList from '../components/MenuItemList'; // Assuming you have a list component
-
-// --- DATA & LOGIC IMPORTS ---
-// Assuming your data is in /data and calculations are in /lib
-import menuData from '../data/menu_data.json';
+import { useState } from 'react'; // <--- MUST BE INCLUDED
 import { buildMatrixDataset } from '../lib/calculations';
+// NOTE: Importing MatrixChart instead of BCGMatrixChart to match your local file structure.
+import MatrixChart from '../components/MatrixChart'; 
+import menuData from '../data/menu_data.json'; 
+// NOTE: Including these components based on your file structure, though they are placeholders in this code.
+import MenuItemList from '../components/MenuItemList.jsx';
+import OutputPanel from '../components/OutputPanel.jsx';
 
+// --- ROBUST DATA EXTRACTION LOGIC ---
+let rawItems;
+// Safely extract the item array from the imported JSON
+if (menuData && menuData.items && Array.isArray(menuData.items)) {
+    rawItems = menuData.items;
+} else if (Array.isArray(menuData)) {
+    rawItems = menuData;
+} else if (menuData && menuData.data && Array.isArray(menuData.data)) {
+    rawItems = menuData.data;
+} else {
+    console.error("Could not find the array of menu items in menu_data.json. Check the JSON structure.");
+    rawItems = [];
+}
+// --- END DATA EXTRACTION ---
 
-// 1. Process data once outside the component (or use useMemo if data were dynamic)
-// This applies your BCG logic, quadrant labels, and recommendations to the data.
-const PROCESSED_DATA = buildMatrixDataset(menuData); 
+// Process the safely extracted array of items
+const PROCESSED_DATA = buildMatrixDataset(rawItems);
 
-export default function Home() {
-  // 2. State to hold the item currently selected on the chart or list
+export default function App() {
+  // State management setup for item selection (even if MenuItemList/OutputPanel are placeholders)
   const [selectedItem, setSelectedItem] = useState(null); 
   
-  // A consistent ID for highlighting the selected item in the chart and list
-  // Assumes each item has a unique 'id' field
-  const activeId = selectedItem ? selectedItem.id : null; 
-
   return (
-    <div className="dashboard-container">
-      
-      {/* This div wraps your chart and output panel/list, 
-        assuming a standard side-by-side layout (adjust classes as needed)
-      */}
-      <div className="bcg-main-view">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
+      <header className="mb-8 text-center">
+        <h1 className="text-4xl font-extrabold text-indigo-700 mb-2">BCG Matrix Dashboard</h1>
+        <p className="text-xl text-gray-500">Strategic Portfolio Analysis for Menu Items</p>
+      </header>
 
-        {/* 3. MatrixChart receives data and the function to set the selected item. 
-          The chart click handler must call onSelect(itemData).
-        */}
-        <div className="chart-section">
-          <h2>BCG Menu Matrix</h2>
-          <MatrixChart 
-            data={PROCESSED_DATA} 
-            activeId={activeId}
-            onSelect={setSelectedItem} // Passes the state setter
-          />
+      <main className="max-w-7xl mx-auto bg-white shadow-xl rounded-xl p-6 grid lg:grid-cols-3 gap-8">
+        
+        {/* BCG Chart Area (takes 2/3 width on large screens) */}
+        <div className="lg:col-span-2 flex flex-col items-center">
+            <MatrixChart data={PROCESSED_DATA} />
+            <div className="mt-12 w-full text-center text-gray-500 text-sm italic">
+                Bubble size reflects absolute revenue. X-axis is Relative Market Share (Revenue), Y-axis is Market Growth Rate (Volume).
+            </div>
         </div>
 
-        {/* 4. OutputPanel displays the details of the selected item.
-          It now receives the fully processed item, including 'recommendation'.
-        */}
-        <div className="output-section">
-          <OutputPanel 
-            selectedItem={selectedItem} 
-          />
+        {/* Side Panel for List/Recommendations (takes 1/3 width) */}
+        <div className="lg:col-span-1 border-l pl-6 border-gray-200">
+            {/* The MenuItemList and OutputPanel are added here based on your file structure, 
+                ready for future implementation of selection logic. */}
+            <h3 className="text-xl font-semibold mb-4 text-gray-700">Menu Item List</h3>
+            <MenuItemList 
+                items={PROCESSED_DATA} 
+                onSelect={setSelectedItem}
+                selectedId={selectedItem ? selectedItem.name : null}
+            />
+            <OutputPanel selectedItem={selectedItem} />
         </div>
-      </div>
-      
-      {/* 5. MenuItemList (optional UI element) receives the same data and setter.
-        A list item click handler must call onSelect(itemData).
-      */}
-      <div className="list-section">
-         <MenuItemList 
-            data={PROCESSED_DATA} 
-            activeId={activeId}
-            onSelect={setSelectedItem}
-          />
-      </div>
 
+      </main>
+
+      <footer className="mt-8 text-center text-sm text-gray-400">
+        © 2024 BCG Matrix Analyzer | Data analysis powered by local calculation engine.
+      </footer>
     </div>
   );
 }
