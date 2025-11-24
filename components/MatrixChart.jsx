@@ -1,123 +1,134 @@
 import React from 'react';
 
-// Define colors for the bubbles
-const classificationColors = {
-  'Star': { class: 'bg-green-500 hover:bg-green-600', text: 'Stars' },
-  'Cash Cow': { class: 'bg-blue-500 hover:bg-blue-600', text: 'Cash Cows' },
-  'Question Mark': { class: 'bg-yellow-500 hover:bg-yellow-600', text: 'Question Marks' },
-  'Dog': { class: 'bg-red-500 hover:bg-red-600', text: 'Dogs' },
+// Define the colors for the bubbles based on their classification
+const quadrantColors = {
+    'Star': '#48BB78',       // Green
+    'Cash Cow': '#4299E1',   // Blue
+    'Question Mark': '#F6E05E', // Yellow
+    'Dog': '#F56565',        // Red
 };
 
-// Map calculated size (0-100) to standard Tailwind size classes for safety
-const getSizeClass = (size) => {
-    if (size >= 80) return 'h-20 w-20'; // max size
-    if (size >= 60) return 'h-16 w-16';
-    if (size >= 40) return 'h-12 w-12';
-    if (size >= 20) return 'h-8 w-8'; // min size
-    return 'h-6 w-6';
-};
+const MatrixChart = ({ items, onSelect, selectedId }) => {
+    // Define the dimensions of the chart area (relative to the container)
+    const size = 300; // SVG viewBox size
+    const half = size / 2;
 
-// Component for a single, positioned data bubble
-const DataBubble = ({ item, onSelect, selected }) => {
-  const sizeClass = getSizeClass(item.size);
+    // The maximum size for a bubble (based on absolute revenue/volume)
+    const MAX_BUBBLE_RADIUS = 30;
 
-  // CRITICAL FIX: Clamp x and y between 5% and 95% to prevent the radius of the largest bubble from spilling 
-  // outside the chart boundaries.
-  const clampedX = Math.max(5, Math.min(95, item.x)); 
-  const clampedY = Math.max(5, Math.min(95, item.y)); 
+    // Find the maximum revenue/volume to scale the bubble sizes proportionally
+    // Use 1 as a fallback to avoid division by zero if items array is empty or has zero revenue
+    const maxRevenue = Math.max(...items.map(item => item.revenue), 1);
+    const maxVolume = Math.max(...items.map(item => item.volume), 1);
+    const maxBubbleBase = Math.max(maxRevenue, maxVolume);
 
-  // Calculate position: X is straight percentage, Y is inverted (CSS 0% is top of the relative container)
-  const leftPosition = `${clampedX}%`; 
-  const bottomPosition = `${clampedY}%`; 
 
-  return (
-    <div
-      onClick={() => onSelect(item)} // Handle click
-      className={`absolute rounded-full shadow-lg transition-all duration-300 transform -translate-x-1/2 -translate-y-1/2 
-        ${classificationColors[item.classification].class} ${sizeClass} cursor-pointer opacity-80 border-2 border-white
-        ${selected ? 'ring-4 ring-offset-2 ring-indigo-500 z-10' : 'hover:opacity-100 hover:scale-110'}`} // Highlight selection
-      style={{ left: leftPosition, bottom: bottomPosition }}
-      // Use the 'title' attribute for a tooltip on hover
-      title={`${item.name} (${item.classification}) - Share: ${item.x.toFixed(1)}%, Growth: ${item.y.toFixed(1)}%`}
-    >
-    </div>
-  );
-};
-
-// Main BCG Matrix Chart Component
-const MatrixChart = ({ data, onSelect, selectedItem }) => {
-  if (!data || data.length === 0) {
     return (
-      <div className="text-center p-10 text-gray-500">
-        No data available to build the BCG Matrix.
-      </div>
-    );
-  }
+        <div className="flex-none bg-white p-6 rounded-lg shadow-xl ring-1 ring-gray-100 mb-8 w-full md:w-1/2 lg:w-3/5 xl:w-2/3">
+            <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Boston Consulting Group Matrix</h2>
 
-  return (
-    <div className="flex flex-col items-center">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Boston Consulting Group Matrix</h2>
-        
-        {/* Chart Container - Fixed Aspect Ratio 1:1, Responsive Width */}
-        <div className="relative w-full max-w-2xl bg-gray-50 border-4 border-gray-300 aspect-square shadow-xl rounded-lg">
-            
-            {/* Quadrant Backgrounds (50% x 50% areas) */}
-            
-            {/* Top-Right (Star: High Share, High Growth) */}
-            <div className="absolute w-1/2 h-1/2 bottom-1/2 right-0 bg-green-50 opacity-40"></div>
-            {/* Top-Left (Question Mark: Low Share, High Growth) */}
-            <div className="absolute w-1/2 h-1/2 bottom-1/2 left-0 bg-yellow-50 opacity-40"></div>
-            {/* Bottom-Right (Cash Cow: High Share, Low Growth) */}
-            <div className="absolute w-1/2 h-1/2 top-1/2 right-0 bg-blue-50 opacity-40"></div>
-            {/* Bottom-Left (Dog: Low Share, Low Growth) */}
-            <div className="absolute w-1/2 h-1/2 top-1/2 left-0 bg-red-50 opacity-40"></div>
-            
-            {/* Axes Lines (50% threshold) */}
-            <div className="absolute w-full h-0.5 bg-gray-600 top-1/2 transform -translate-y-1/2"></div>
-            <div className="absolute h-full w-0.5 bg-gray-600 left-1/2 transform -translate-x-1/2"></div>
-            
-            {/* Data Points (Bubbles) */}
-            {data.map((item, index) => (
-                <DataBubble 
-                    key={index} 
-                    item={item} 
-                    onSelect={onSelect} // Pass click handler
-                    selected={selectedItem && selectedItem.name === item.name} // Pass selection state
-                />
-            ))}
+            <div className="flex justify-center items-center relative">
+                <svg viewBox={`0 0 ${size} ${size}`} width="100%" height="auto" style={{ maxWidth: '400px', maxHeight: '400px' }}>
+                    
+                    {/* --- Quadrants (Background Grid) --- */}
+                    
+                    {/* Stars (Top Right) */}
+                    <rect x={half} y={0} width={half} height={half} fill="#F0FFF4" stroke="#48BB78" strokeOpacity="0.5" />
+                    <text x={half + 10} y={20} className="text-sm font-bold fill-current text-green-700">Stars</text>
 
-            {/* Quadrant Labels - Fixed absolute positioning and improved styling */}
-            <div className="absolute top-0 left-0 w-full h-full p-4 pointer-events-none">
-                <span className="absolute top-2 left-2 text-2xl text-yellow-800 font-extrabold opacity-75">Question Marks</span>
-                <span className="absolute top-2 right-2 text-2xl text-green-800 font-extrabold opacity-75">Stars</span>
-                <span className="absolute bottom-2 left-2 text-2xl text-red-800 font-extrabold opacity-75">Dogs</span>
-                <span className="absolute bottom-2 right-2 text-2xl text-blue-800 font-extrabold opacity-75">Cash Cows</span>
+                    {/* Cash Cows (Bottom Right) */}
+                    <rect x={half} y={half} width={half} height={half} fill="#EBF8FF" stroke="#4299E1" strokeOpacity="0.5" />
+                    <text x={half + 10} y={half + 20} className="text-sm font-bold fill-current text-blue-700">Cash Cows</text>
+
+                    {/* Question Marks (Top Left) */}
+                    <rect x={0} y={0} width={half} height={half} fill="#FFFFF0" stroke="#F6E05E" strokeOpacity="0.5" />
+                    <text x={10} y={20} className="text-sm font-bold fill-current text-yellow-700">Question Marks</text>
+
+                    {/* Dogs (Bottom Left) */}
+                    <rect x={0} y={half} width={half} height={half} fill="#FFF5F5" stroke="#F56565" strokeOpacity="0.5" />
+                    <text x={10} y={half + 20} className="text-sm font-bold fill-current text-red-700">Dogs</text>
+
+                    {/* --- Axes Lines --- */}
+                    <line x1={0} y1={half} x2={size} y2={half} stroke="#CBD5E0" strokeWidth="1" />
+                    <line x1={half} y1={0} x2={half} y2={size} stroke="#CBD5E0" strokeWidth="1" />
+
+                    {/* --- Data Bubbles --- */}
+                    {items.map((item, index) => {
+                        // X-axis: Relative Market Share (0 to 100). Higher share is further right.
+                        // Scale x from [0, 100] to [0, size].
+                        const scaledX = (item.x / 100) * size;
+
+                        // Y-axis: Market Growth Rate (0 to 100). Higher growth is further up.
+                        // Scale y from [0, 100] to [0, size]. The y-axis is inverted in SVG coordinates.
+                        const scaledY = size - ((item.y / 100) * size);
+
+                        // Bubble Radius: Based on the item's revenue (absolute size)
+                        const radius = Math.sqrt(item.revenue / maxBubbleBase) * MAX_BUBBLE_RADIUS;
+                        
+                        // Check if the current item is the selected item for dynamic highlighting
+                        const isSelected = item.name === selectedId;
+
+                        return (
+                            <g key={index}>
+                                {/* Bubble element - Now with an onClick handler! */}
+                                <circle
+                                    cx={scaledX}
+                                    cy={scaledY}
+                                    r={radius}
+                                    fill={quadrantColors[item.classification]}
+                                    fillOpacity="0.75"
+                                    stroke={isSelected ? "#3182CE" : "#A0AEC0"}
+                                    strokeWidth={isSelected ? 4 : 1}
+                                    className="cursor-pointer transition-all duration-300 hover:fill-opacity-100 hover:ring-2 hover:ring-indigo-400"
+                                    onClick={() => onSelect(item)} // *** CLICK HANDLER ADDED HERE ***
+                                >
+                                    {/* Tooltip on hover */}
+                                    <title>{`${item.name} (${item.classification})\nShare: ${item.x.toFixed(1)}%\nGrowth: ${item.y.toFixed(1)}%\nRevenue: $${item.revenue.toLocaleString()}`}</title>
+                                </circle>
+
+                                {/* Optional: Add text label next to the bubble (only for selected items for clean design) */}
+                                {isSelected && (
+                                    <text 
+                                        x={scaledX + radius + 3} 
+                                        y={scaledY + 5} 
+                                        fontSize="10" 
+                                        fontWeight="bold"
+                                        fill="#3182CE"
+                                    >
+                                        {item.name}
+                                    </text>
+                                )}
+                            </g>
+                        );
+                    })}
+
+                    {/* --- X-Axis Label (Bottom) --- */}
+                    <text x={half} y={size + 30} textAnchor="middle" fontSize="12" fill="#4A5568">
+                        Relative Market Share (Revenue %)
+                    </text>
+
+                    {/* --- Y-Axis Label (Left) --- */}
+                    <text x={-20} y={half} textAnchor="middle" transform={`rotate(-90 ${-20} ${half})`} fontSize="12" fill="#4A5568">
+                        Market Growth Rate (Volume %)
+                    </text>
+                    
+                </svg>
             </div>
-            
-            {/* X-Axis Label (Bottom) */}
-            <div className="absolute w-full bottom-[-2.5rem] text-center text-lg font-semibold text-gray-700">
-                Relative Market Share (Revenue %)
-            </div>
-            {/* Y-Axis Label (Left) - Rotated */}
-            <div className="absolute h-full left-[-3.5rem] top-0 flex items-center justify-center">
-                <span className="transform -rotate-90 text-lg font-semibold text-gray-700 whitespace-nowrap">
-                    Market Growth Rate (Volume %)
-                </span>
-            </div>
-            
-        </div>
-        
-        {/* Legend */}
-        <div className="mt-12 p-4 border rounded-lg shadow-sm bg-white grid grid-cols-2 gap-4 text-center w-full max-w-md">
-            {Object.keys(classificationColors).map(key => (
-                <div key={key} className="flex items-center space-x-2 justify-center">
-                    <div className={`h-4 w-4 rounded-full ${classificationColors[key].class} opacity-75`}></div>
-                    <span className="font-medium text-gray-700">{classificationColors[key].text}</span>
+
+            {/* --- Legend --- */}
+            <div className="mt-8 pt-4 border-t border-gray-200">
+                <p className="text-sm text-gray-600 mb-2 font-semibold">Legend:</p>
+                <div className="flex justify-center space-x-6 text-sm">
+                    {Object.entries(quadrantColors).map(([name, color]) => (
+                        <div key={name} className="flex items-center space-x-2">
+                            <span style={{ backgroundColor: color }} className="w-3 h-3 rounded-full opacity-75"></span>
+                            <span className="text-gray-700">{name}</span>
+                        </div>
+                    ))}
                 </div>
-            ))}
+            </div>
         </div>
-    </div>
-  );
+    );
 };
 
 export default MatrixChart;
