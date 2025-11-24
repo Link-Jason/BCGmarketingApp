@@ -1,13 +1,12 @@
 'use client'; 
 
-import { useState } from 'react'; // <--- MUST BE INCLUDED
+// Import useState (needed for interactivity)
+import { useState } from 'react'; 
 import { buildMatrixDataset } from '../lib/calculations';
-// NOTE: Importing MatrixChart instead of BCGMatrixChart to match your local file structure.
 import MatrixChart from '../components/MatrixChart'; 
+import MenuItemList from '../components/MenuItemList'; 
+import OutputPanel from '../components/OutputPanel'; 
 import menuData from '../data/menu_data.json'; 
-// NOTE: Including these components based on your file structure, though they are placeholders in this code.
-import MenuItemList from '../components/MenuItemList.jsx';
-import OutputPanel from '../components/OutputPanel.jsx';
 
 // --- ROBUST DATA EXTRACTION LOGIC ---
 let rawItems;
@@ -28,7 +27,7 @@ if (menuData && menuData.items && Array.isArray(menuData.items)) {
 const PROCESSED_DATA = buildMatrixDataset(rawItems);
 
 export default function App() {
-  // State management setup for item selection (even if MenuItemList/OutputPanel are placeholders)
+  // State to hold the item currently selected on the chart or list
   const [selectedItem, setSelectedItem] = useState(null); 
   
   return (
@@ -42,7 +41,12 @@ export default function App() {
         
         {/* BCG Chart Area (takes 2/3 width on large screens) */}
         <div className="lg:col-span-2 flex flex-col items-center">
-            <MatrixChart data={PROCESSED_DATA} />
+            {/* PASS THE SETTER FUNCTION to MatrixChart */}
+            <MatrixChart 
+                data={PROCESSED_DATA} 
+                onSelect={setSelectedItem}
+                selectedItem={selectedItem}
+            />
             <div className="mt-12 w-full text-center text-gray-500 text-sm italic">
                 Bubble size reflects absolute revenue. X-axis is Relative Market Share (Revenue), Y-axis is Market Growth Rate (Volume).
             </div>
@@ -50,9 +54,7 @@ export default function App() {
 
         {/* Side Panel for List/Recommendations (takes 1/3 width) */}
         <div className="lg:col-span-1 border-l pl-6 border-gray-200">
-            {/* The MenuItemList and OutputPanel are added here based on your file structure, 
-                ready for future implementation of selection logic. */}
-            <h3 className="text-xl font-semibold mb-4 text-gray-700">Menu Item List</h3>
+            {/* Use the correct prop name: items, not data */}
             <MenuItemList 
                 items={PROCESSED_DATA} 
                 onSelect={setSelectedItem}

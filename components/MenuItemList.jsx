@@ -1,46 +1,55 @@
-
 import React from 'react';
-import { cn } from "@/lib/utils"; 
 
-// Use the same quadrant colors you defined elsewhere for border highlights
-const QUADRANT_COLOR = {
-    STAR: "border-sky-500",
-    CASH_COW: "border-emerald-500",
-    QUESTION_MARK: "border-orange-500",
-    DOG: "border-gray-500"
+// Define the colors for the list borders
+const borderColors = {
+    'Star': 'border-green-500',
+    'Cash Cow': 'border-blue-500',
+    'Question Mark': 'border-yellow-500',
+    'Dog': 'border-red-500',
 };
 
-export default function MenuItemList({ data = [], onSelect, activeId }) {
+// Map quadrant to recommended action
+const actionMap = {
+    'Star': 'Invest aggressively to maintain market share.',
+    'Cash Cow': 'Milk the profits with minimal investment.',
+    'Question Mark': 'Analyze closely; either invest to become a Star or divest.',
+    'Dog': 'Divest or phase out the product line.',
+};
 
-    if (!data.length) {
-        return <p className="p-4 bg-gray-50 text-center text-gray-500">No menu items loaded.</p>;
+const MenuItemList = ({ items, onSelect, selectedId }) => {
+    if (!items || items.length === 0) {
+        return (
+            <div className="text-center p-4 text-gray-500 bg-gray-100 rounded-lg">
+                No menu items loaded.
+            </div>
+        );
     }
 
     return (
-        <div className="p-4 bg-white rounded-xl shadow-sm border border-slate-200 h-full overflow-y-auto">
-            <h3 className="text-xl font-bold mb-3 text-slate-800">Menu Item List ({data.length})</h3>
-            
-            <div className="space-y-2">
-                {data.map(item => (
+        <div className="mb-8">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Menu Item List ({items.length})
+            </h3>
+            <div className="max-h-[400px] overflow-y-auto space-y-2 pr-2">
+                {items.map((item) => (
                     <div
-                        key={item.id} 
-                        className={cn(
-                            "p-3 rounded-lg border-l-4 cursor-pointer transition-colors",
-                            "hover:bg-slate-50",
-                            QUADRANT_COLOR[item.quadrantKey], 
-                            {
-                                // Apply special styling if this item is currently selected
-                                "bg-slate-100 ring-2 ring-inset ring-slate-400": item.id === activeId
-                            }
-                        )}
-                        // 🚨 CRITICAL: This is the click handler 🚨
-                        onClick={() => onSelect(item)} 
+                        key={item.name}
+                        onClick={() => onSelect(item)}
+                        className={`p-3 border-l-4 rounded-md cursor-pointer transition-all duration-150 shadow-sm 
+                            ${borderColors[item.classification]} 
+                            ${selectedId === item.name ? 'bg-indigo-50 ring-2 ring-indigo-500' : 'bg-white hover:bg-gray-50'}`}
                     >
-                        <p className="font-semibold text-slate-900">{item.name}</p>
-                        <p className="text-xs text-slate-500">{item.quadrant}</p>
+                        <p className="font-semibold text-gray-900">{item.name}</p>
+                        <p className={`text-sm font-medium ${selectedId === item.name ? 'text-indigo-600' : 'text-gray-500'}`}>
+                            {item.classification}
+                        </p>
                     </div>
                 ))}
             </div>
         </div>
     );
-}
+};
+
+export default MenuItemList;
+
+export { actionMap };

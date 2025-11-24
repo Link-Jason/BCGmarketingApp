@@ -18,7 +18,8 @@ const getSizeClass = (size) => {
 };
 
 // Component for a single, positioned data bubble
-const DataBubble = ({ item }) => {
+// Added onSelect prop
+const DataBubble = ({ item, onSelect, selected }) => {
   const sizeClass = getSizeClass(item.size);
 
   // Calculate position: X is straight percentage, Y is inverted (CSS 0% is top of the relative container)
@@ -27,8 +28,10 @@ const DataBubble = ({ item }) => {
 
   return (
     <div
+      onClick={() => onSelect(item)} // Handle click
       className={`absolute rounded-full shadow-lg transition-all duration-300 transform -translate-x-1/2 -translate-y-1/2 
-        ${classificationColors[item.classification].class} ${sizeClass} cursor-pointer opacity-75 ring-4 ring-white`}
+        ${classificationColors[item.classification].class} ${sizeClass} cursor-pointer opacity-75
+        ${selected ? 'ring-4 ring-offset-2 ring-indigo-500 z-10' : 'ring-4 ring-white'}`} // Highlight selection
       style={{ left: leftPosition, bottom: bottomPosition }}
       // Use the 'title' attribute for a tooltip on hover
       title={`${item.name} (${item.classification}) - Share: ${item.x.toFixed(1)}%, Growth: ${item.y.toFixed(1)}%, Revenue: $${item.revenue.toLocaleString()}`}
@@ -38,7 +41,8 @@ const DataBubble = ({ item }) => {
 };
 
 // Main BCG Matrix Chart Component
-const MatrixChart = ({ data }) => {
+// Added onSelect and selectedItem props
+const MatrixChart = ({ data, onSelect, selectedItem }) => {
   if (!data || data.length === 0) {
     return (
       <div className="text-center p-10 text-gray-500">
@@ -71,7 +75,12 @@ const MatrixChart = ({ data }) => {
             
             {/* Data Points (Bubbles) */}
             {data.map((item, index) => (
-                <DataBubble key={index} item={item} />
+                <DataBubble 
+                    key={index} 
+                    item={item} 
+                    onSelect={onSelect} // Pass click handler
+                    selected={selectedItem && selectedItem.name === item.name} // Pass selection state
+                />
             ))}
 
             {/* Quadrant Labels - Fixed absolute positioning */}
