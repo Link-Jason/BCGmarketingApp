@@ -54,19 +54,24 @@ const MatrixChart = ({ items, onSelect, selectedId }) => {
 
                     {/* --- Data Bubbles --- */}
                     {items.map((item, index) => {
-                        // X-axis: Relative Market Share (0 to 100). Higher share is further right.
-                        // Scale x from [0, 100] to [0, size].
-                        const scaledX = (item.x / 100) * size;
+                        // --- SCALING FIX IMPLEMENTED HERE ---
+                        const PADDING = MAX_BUBBLE_RADIUS; 
+                        const DRAWABLE_SIZE = size - (2 * PADDING);
 
-                        // Y-axis: Market Growth Rate (0 to 100). Higher growth is further up.
-                        // Scale y from [0, 100] to [0, size]. The y-axis is inverted in SVG coordinates.
-                        const scaledY = size - ((item.y / 100) * size);
+                        // X-axis: Relative Market Share (0 to 100). Higher share is further right.
+                        // Scale x from [0, 100] to [PADDING, PADDING + DRAWABLE_SIZE].
+                        const scaledX = PADDING + ((item.x / 100) * DRAWABLE_SIZE);
+
+                        // Y-axis: Market Growth Rate (0 to 100). Higher growth is further up. (Inverted for SVG)
+                        // Scale y from [0, 100] to [size - PADDING, PADDING].
+                        const scaledY = size - PADDING - ((item.y / 100) * DRAWABLE_SIZE);
 
                         // Bubble Radius: Based on the item's revenue (absolute size)
                         const radius = Math.sqrt(item.revenue / maxBubbleBase) * MAX_BUBBLE_RADIUS;
                         
                         // Check if the current item is the selected item for dynamic highlighting
-                        const isSelected = item.name === selectedId;
+                        // IMPORTANT: Check against the new 'id' property
+                        const isSelected = item.id === selectedId;
 
                         return (
                             <g key={index}>
