@@ -1,22 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-// Import the components and add the .jsx extension
+// Import the components with the .jsx extension
 import MatrixChart from '../components/MatrixChart.jsx';
 import MenuItemList from '../components/MenuItemList.jsx';
 import OutputPanel from '../components/OutputPanel.jsx';
 
-// Import raw data and ensure .js extension
-import { MENU_ITEMS } from '../data/MenuData.js';
+// Import raw data using the new export name and .js extension
+import { RAW_MENU_ITEMS } from '../data/MenuData.js';
 
 
 /**
- * Calculates the BCG Classification for a single menu item.
- * Classification is based on Relative Market Share (X) and Market Growth Rate (Y).
+ * Calculates the BCG Classification for a single menu item based on x (Share) and y (Growth).
  * X > 50% AND Y > 50% => Star
- * X > 50% AND Y <= 50% => Cash Cow
- * X <= 50% AND Y > 50% => Question Mark
- * X <= 50% AND Y <= 50% => Dog
  */
 const classifyItem = (item) => {
     // Check if item has the necessary properties before comparison
@@ -38,22 +34,50 @@ const classifyItem = (item) => {
  * Main application component for the BCG Marketing Dashboard.
  */
 export default function Home() {
-    // FIX: Initialize menuItems state to an EMPTY ARRAY [] to prevent the .map() error during build/prerender.
+    // Initialize state
     const [menuItems, setMenuItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Simple client-side data simulation
-        const calculatedItems = MENU_ITEMS.map(item => ({
-            ...item,
-            // Calculate classification based on the raw x/y values
-            classification: classifyItem(item),
-        }));
+        // --- 1. FIND BENCHMARKS (Max Revenue and Volume) ---
+        // Find maximum values to establish a 100% benchmark for scaling
+        const maxRevenue = Math.max(...RAW_MENU_ITEMS.map(item => item.revenue), 1);
+        const maxVolume = Math.max(...RAW_MENU_ITEMS.map(item => item.volume), 1);
 
+        // --- 2. CALCULATE AND TRANSFORM DATA ---
+        const calculatedItems = RAW_MENU_ITEMS.map(item => {
+            // Calculate x (Relative Market Share) - Revenue / Max Revenue * 100
+            const x = (item.revenue / maxRevenue) * 100;
+
+            // Calculate y (Market Growth Rate) - Volume / Max Volume * 100
+            const y = (item.volume / maxVolume) * 100;
+            
+            const margin = 0.5; // Placeholder: You can replace this with a real calculation later
+
+            // Clean the name from the "(Classification)" suffix for display in the OutputPanel
+            // e.g., "Espresso Shot (Dog)" becomes "Espresso Shot"
+            const cleanedName = item.name.replace(/\s*\([^)]*\)\s*$/, '');
+            
+            return {
+                // 'id' is used for selection/tracking (full name)
+                id: item.name, 
+                // 'name' is used for display in the OutputPanel header (cleaned name)
+                name: cleanedName, 
+                revenue: item.revenue,
+                volume: item.volume,
+                x, 
+                y,
+                margin,
+                // Classification logic uses the calculated x and y values
+                classification: classifyItem({ x, y }),
+            };
+        });
+
+        // --- 3. SET STATE ---
         setMenuItems(calculatedItems);
         setIsLoading(false);
-        // Automatically select the first item if data exists
+        // Automatically select the first item using its new 'id'
         if (calculatedItems.length > 0) {
             setSelectedItem(calculatedItems[0]);
         }
@@ -86,15 +110,17 @@ export default function Home() {
                 {/* Left Column: Matrix Chart and Menu List */}
                 <div className="w-full lg:w-2/3 flex flex-col gap-8">
                     <MatrixChart 
-                        items={menuItems} // Now guaranteed to be an array []
+                        items={menuItems} 
                         onSelect={handleSelectItem}
-                        selectedId={selectedItem ? selectedItem.name : null}
+                        // CRITICAL: Now using item.id for selection
+                        selectedId={selectedItem ? selectedItem.id : null} 
                     />
                     <div className="bg-white p-6 rounded-lg shadow-xl ring-1 ring-gray-100">
                         <MenuItemList
-                            items={menuItems} // Now guaranteed to be an array []
+                            items={menuItems}
                             onSelect={handleSelectItem}
-                            selectedId={selectedItem ? selectedItem.name : null}
+                            // CRITICAL: Now using item.id for selection
+                            selectedId={selectedItem ? selectedItem.id : null}
                         />
                     </div>
                 </div>
