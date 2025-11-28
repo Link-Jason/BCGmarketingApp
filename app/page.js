@@ -80,8 +80,8 @@ export default function Page() {
         </div>
 
         <div className="w-full xl:w-1/3 flex flex-col gap-8">
-          {/*
           <OutputPanel selectedItem={selectedItem} />
+          {/*
           <MenuItemList
             items={menuItems}
             onSelect={handleSelectItem}
