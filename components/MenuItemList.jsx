@@ -1,6 +1,6 @@
 import React from 'react';
 import { List } from 'lucide-react';
-import { COLOR_MAP } from '../data/MarketingPrompts';
+import { MARKETING_ACTION_PROMPTS, COLOR_MAP } from '../data/MarketingPrompts.js';
 
 const MenuItemList = ({ items, onSelect, selectedId }) => {
   if (!items || items.length === 0) {
@@ -19,6 +19,7 @@ const MenuItemList = ({ items, onSelect, selectedId }) => {
       <div className="max-h-[300px] overflow-y-auto space-y-3 pr-2">
         {items.map((item) => {
           const colors = COLOR_MAP[item.classification] || COLOR_MAP.Unknown;
+          const prompt = MARKETING_ACTION_PROMPTS[item.classification] || MARKETING_ACTION_PROMPTS.Unknown;
           const isSelected = item.id === selectedId;
 
           return (
@@ -41,6 +42,9 @@ const MenuItemList = ({ items, onSelect, selectedId }) => {
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 Share: {item.x.toFixed(1)}% | Growth: {item.y.toFixed(1)}%
+              </p>
+              <p className="text-[11px] text-gray-400 mt-1 line-clamp-2">
+                {prompt.action}
               </p>
             </div>
           );

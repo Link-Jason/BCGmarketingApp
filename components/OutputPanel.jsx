@@ -1,6 +1,6 @@
 import React from 'react';
 import { Zap, Target, TrendingUp, DollarSign } from 'lucide-react';
-import { MARKETING_ACTION_PROMPTS, COLOR_MAP } from '../data/MarketingPrompts';
+import { MARKETING_ACTION_PROMPTS, COLOR_MAP } from '../data/MarketingPrompts.js';
 
 const OutputPanel = ({ selectedItem }) => {
   if (!selectedItem) {

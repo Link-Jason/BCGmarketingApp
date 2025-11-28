@@ -1,5 +1,5 @@
 import React from 'react';
-import { COLOR_MAP } from '../data/MarketingPrompts';
+import { MARKETING_ACTION_PROMPTS, COLOR_MAP } from '../data/MarketingPrompts.js';
 
 /**
  * MatrixChart Component (SVG Bubble Chart)
@@ -94,6 +94,7 @@ const MatrixChart = ({ items, onSelect, selectedId }) => {
             );
             const selected = selectedId === item.id;
             const color = COLOR_MAP[item.classification]?.fill || '#bbb';
+            const prompt = MARKETING_ACTION_PROMPTS[item.classification] || MARKETING_ACTION_PROMPTS.Unknown;
 
             return (
               <g key={item.id}>
@@ -111,7 +112,9 @@ const MatrixChart = ({ items, onSelect, selectedId }) => {
                   <title>
                     {`${item.name} (${item.classification})\nShare: ${item.x.toFixed(
                       1,
-                    )}%\nGrowth: ${item.y.toFixed(1)}%\nRevenue: $${item.revenue.toLocaleString()}`}
+                    )}%\nGrowth: ${item.y.toFixed(1)}%\nRevenue: $${item.revenue.toLocaleString()}\nAction: ${
+                      prompt.action
+                    }`}
                   </title>
                 </circle>
 
