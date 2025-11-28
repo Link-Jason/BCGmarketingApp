@@ -1,6 +1,6 @@
 import React from 'react';
 import { List } from 'lucide-react';
-import { MARKETING_ACTION_PROMPTS, COLOR_MAP } from '../data/MarketingPrompts.js';
+import { MARKETING_ACTION_PROMPTS, COLOR_MAP } from '../data/MarketingPrompts';
 
 const MenuItemList = ({ items, onSelect, selectedId }) => {
   if (!items || items.length === 0) {

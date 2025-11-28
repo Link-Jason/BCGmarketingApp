@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { RAW_MENU_ITEMS } from '../data/MenuData';
-import { classifyItem } from '../lib/calculations';
-import MatrixChart from '../components/MatrixChart';
-import OutputPanel from '../components/OutputPanel';
-import MenuItemList from '../components/MenuItemList';
+// Explicitly include .js for data files
+import { RAW_MENU_ITEMS } from '../data/MenuData.js'; 
+import { classifyItem } from '../lib/calculations.js';
+// Explicitly include .jsx for components
+import MatrixChart from '../components/MatrixChart.jsx'; 
+import OutputPanel from '../components/OutputPanel.jsx';
+import MenuItemList from '../components/MenuItemList.jsx';
 
 export default function Page() {
   const [menuItems, setMenuItems] = useState([]);
@@ -13,6 +15,8 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // FIX: Using || 0 to ensure Math.max does not receive 'undefined' or 'null', 
+    // which causes a client-side crash in some environments.
     const maxRevenue = Math.max(1, ...RAW_MENU_ITEMS.map((item) => item.revenue || 0));
     const maxVolume = Math.max(1, ...RAW_MENU_ITEMS.map((item) => item.volume || 0));
 
@@ -21,9 +25,12 @@ export default function Page() {
       const y = (item.volume / maxVolume) * 100;
       const margin = item.margin ?? 0.5;
 
+      // Clean the name from the "(Classification)" suffix for display 
+      const cleanedName = item.name.replace(/\s*\([^)]*\)\s*$/, '');
+
       return {
-        id: item.name,
-        name: item.name,
+        id: item.name, // Use full name as unique ID for selection
+        name: cleanedName, // Cleaned name for display
         revenue: item.revenue,
         volume: item.volume,
         x,
@@ -64,21 +71,32 @@ export default function Page() {
       </header>
 
       <div className="flex flex-col xl:flex-row gap-8 max-w-7xl mx-auto">
+        {/*
+          // DEBUG STEP: Temporarily removed components to isolate crash source. 
+          // If the page loads now, the crash is in one of the components below.
+        */}
         <div className="w-full xl:w-2/3 flex flex-col gap-8">
+          <p className="text-3xl text-red-600 font-bold p-10 text-center border-4 border-red-600 bg-white shadow-lg">
+            DASHBOARD BASE PAGE LOADED SUCCESSFULLY
+          </p>
+          {/*
           <MatrixChart
             items={menuItems}
             onSelect={handleSelectItem}
             selectedId={selectedItem ? selectedItem.id : null}
           />
+          */}
         </div>
 
         <div className="w-full xl:w-1/3 flex flex-col gap-8">
+          {/*
           <OutputPanel selectedItem={selectedItem} />
           <MenuItemList
             items={menuItems}
             onSelect={handleSelectItem}
             selectedId={selectedItem ? selectedItem.id : null}
           />
+          */}
         </div>
       </div>
 

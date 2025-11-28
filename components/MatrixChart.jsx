@@ -1,5 +1,5 @@
 import React from 'react';
-import { MARKETING_ACTION_PROMPTS, COLOR_MAP } from '../data/MarketingPrompts.js';
+import { MARKETING_ACTION_PROMPTS, COLOR_MAP } from '../data/MarketingPrompts';
 
 /**
  * MatrixChart Component (SVG Bubble Chart)
