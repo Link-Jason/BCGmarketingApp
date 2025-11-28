@@ -13,8 +13,8 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const maxRevenue = Math.max(...RAW_MENU_ITEMS.map((item) => item.revenue), 1);
-    const maxVolume = Math.max(...RAW_MENU_ITEMS.map((item) => item.volume), 1);
+    const maxRevenue = Math.max(1, ...RAW_MENU_ITEMS.map((item) => item.revenue || 0));
+    const maxVolume = Math.max(1, ...RAW_MENU_ITEMS.map((item) => item.volume || 0));
 
     const calculatedItems = RAW_MENU_ITEMS.map((item) => {
       const x = (item.revenue / maxRevenue) * 100;
