@@ -71,21 +71,12 @@ export default function Page() {
       </header>
 
       <div className="flex flex-col xl:flex-row gap-8 max-w-7xl mx-auto">
-        {/*
-          // DEBUG STEP: Temporarily removed components to isolate crash source. 
-          // If the page loads now, the crash is in one of the components below.
-        */}
         <div className="w-full xl:w-2/3 flex flex-col gap-8">
-          <p className="text-3xl text-red-600 font-bold p-10 text-center border-4 border-red-600 bg-white shadow-lg">
-            DASHBOARD BASE PAGE LOADED SUCCESSFULLY
-          </p>
-          {/*
           <MatrixChart
             items={menuItems}
             onSelect={handleSelectItem}
             selectedId={selectedItem ? selectedItem.id : null}
           />
-          */}
         </div>
 
         <div className="w-full xl:w-1/3 flex flex-col gap-8">
