@@ -1,139 +1,214 @@
 import React from 'react';
+import { COLOR_MAP } from '../data/MarketingPrompts';
 
-// Define the colors for the bubbles based on their classification
-const quadrantColors = {
-    'Star': '#48BB78',       // Green
-    'Cash Cow': '#4299E1',   // Blue
-    'Question Mark': '#F6E05E', // Yellow
-    'Dog': '#F56565',        // Red
-};
-
+/**
+ * MatrixChart Component (SVG Bubble Chart)
+ */
 const MatrixChart = ({ items, onSelect, selectedId }) => {
-    // Define the dimensions of the chart area (relative to the container)
-    const size = 300; // SVG viewBox size
-    const half = size / 2;
+  const SIZE = 600;
+  const AXIS_LABEL_SPACE = 60;
+  const MAX_R_SCALING = 25;
+  const MAX_BUBBLE_R = Math.max(8, MAX_R_SCALING * 1.2);
+  const MATRIX_START = AXIS_LABEL_SPACE;
+  const MATRIX_SIZE = SIZE - 2 * AXIS_LABEL_SPACE;
+  const PLOT_SIZE = MATRIX_SIZE - 2 * MAX_BUBBLE_R;
+  const PLOT_START = MATRIX_START + MAX_BUBBLE_R;
+  const HALF_MATRIX_SIZE = MATRIX_SIZE / 2;
+  const maxRevenue = Math.max(...items.map((i) => i.revenue), 1);
+  const verticalLabelX = SIZE - AXIS_LABEL_SPACE + 20;
 
-    // The maximum size for a bubble (based on absolute revenue/volume)
-    const MAX_BUBBLE_RADIUS = 30;
+  return (
+    <div className="bg-white p-8 rounded-xl shadow-2xl ring-1 ring-gray-200">
+      <h2 className="text-3xl font-bold text-center text-gray-800 mb-6 tracking-tight">
+        BCG Growth–Share Matrix
+      </h2>
 
-    // Find the maximum revenue/volume to scale the bubble sizes proportionally
-    // Use 1 as a fallback to avoid division by zero if items array is empty or has zero revenue
-    const maxRevenue = Math.max(...items.map(item => item.revenue), 1);
-    const maxVolume = Math.max(...items.map(item => item.volume), 1);
-    const maxBubbleBase = Math.max(maxRevenue, maxVolume);
+      <div className="w-full flex justify-center">
+        <svg
+          viewBox={`0 0 ${SIZE} ${SIZE}`}
+          width="100%"
+          height="auto"
+          style={{ maxWidth: '700px' }}
+          className="overflow-visible"
+        >
+          <g>
+            <rect
+              x={MATRIX_START}
+              y={MATRIX_START}
+              width={HALF_MATRIX_SIZE}
+              height={HALF_MATRIX_SIZE}
+              fill={COLOR_MAP['Question Mark'].bg_quadrant}
+              rx="8"
+            />
+            <rect
+              x={MATRIX_START + HALF_MATRIX_SIZE}
+              y={MATRIX_START}
+              width={HALF_MATRIX_SIZE}
+              height={HALF_MATRIX_SIZE}
+              fill={COLOR_MAP['Star'].bg_quadrant}
+              rx="8"
+            />
+            <rect
+              x={MATRIX_START}
+              y={MATRIX_START + HALF_MATRIX_SIZE}
+              width={HALF_MATRIX_SIZE}
+              height={HALF_MATRIX_SIZE}
+              fill={COLOR_MAP['Dog'].bg_quadrant}
+              rx="8"
+            />
+            <rect
+              x={MATRIX_START + HALF_MATRIX_SIZE}
+              y={MATRIX_START + HALF_MATRIX_SIZE}
+              width={HALF_MATRIX_SIZE}
+              height={HALF_MATRIX_SIZE}
+              fill={COLOR_MAP['Cash Cow'].bg_quadrant}
+              rx="8"
+            />
+          </g>
 
+          <line
+            x1={MATRIX_START}
+            x2={SIZE - AXIS_LABEL_SPACE}
+            y1={MATRIX_START + HALF_MATRIX_SIZE}
+            y2={MATRIX_START + HALF_MATRIX_SIZE}
+            stroke="#A0AEC0"
+            strokeWidth="2"
+            strokeDasharray="4 4"
+          />
+          <line
+            x1={MATRIX_START + HALF_MATRIX_SIZE}
+            x2={MATRIX_START + HALF_MATRIX_SIZE}
+            y1={MATRIX_START}
+            y2={SIZE - AXIS_LABEL_SPACE}
+            stroke="#A0AEC0"
+            strokeWidth="2"
+            strokeDasharray="4 4"
+          />
 
-    return (
-        <div className="flex-none bg-white p-6 rounded-lg shadow-xl ring-1 ring-gray-100 mb-8 w-full md:w-1/2 lg:w-3/5 xl:w-2/3">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Boston Consulting Group Matrix</h2>
+          {items.map((item) => {
+            const x = PLOT_START + (item.x / 100) * PLOT_SIZE;
+            const y = PLOT_START + PLOT_SIZE - (item.y / 100) * PLOT_SIZE;
+            const r = Math.max(
+              8,
+              Math.sqrt(item.revenue / maxRevenue) * MAX_R_SCALING * 1.2,
+            );
+            const selected = selectedId === item.id;
+            const color = COLOR_MAP[item.classification]?.fill || '#bbb';
 
-            <div className="flex justify-center items-center relative">
-                <svg viewBox={`0 0 ${size} ${size}`} width="100%" height="auto" style={{ maxWidth: '400px', maxHeight: '400px' }}>
-                    
-                    {/* --- Quadrants (Background Grid) --- */}
-                    
-                    {/* Stars (Top Right) */}
-                    <rect x={half} y={0} width={half} height={half} fill="#F0FFF4" stroke="#48BB78" strokeOpacity="0.5" />
-                    <text x={half + 10} y={20} className="text-sm font-bold fill-current text-green-700">Stars</text>
+            return (
+              <g key={item.id}>
+                <circle
+                  cx={x}
+                  cy={y}
+                  r={r}
+                  fill={color}
+                  fillOpacity={selected ? 0.95 : 0.8}
+                  stroke={selected ? '#2B6CB0' : '#A0AEC0'}
+                  strokeWidth={selected ? 4 : 1}
+                  className="cursor-pointer transition-all duration-200 hover:fill-opacity-100"
+                  onClick={() => onSelect(item)}
+                >
+                  <title>
+                    {`${item.name} (${item.classification})\nShare: ${item.x.toFixed(
+                      1,
+                    )}%\nGrowth: ${item.y.toFixed(1)}%\nRevenue: $${item.revenue.toLocaleString()}`}
+                  </title>
+                </circle>
 
-                    {/* Cash Cows (Bottom Right) */}
-                    <rect x={half} y={half} width={half} height={half} fill="#EBF8FF" stroke="#4299E1" strokeOpacity="0.5" />
-                    <text x={half + 10} y={half + 20} className="text-sm font-bold fill-current text-blue-700">Cash Cows</text>
+                {selected && (
+                  <text
+                    x={x}
+                    y={y - r - 8}
+                    textAnchor="middle"
+                    className="text-[14px] font-semibold fill-indigo-700 pointer-events-none bg-white p-1 rounded"
+                  >
+                    {item.name}
+                  </text>
+                )}
+              </g>
+            );
+          })}
 
-                    {/* Question Marks (Top Left) */}
-                    <rect x={0} y={0} width={half} height={half} fill="#FFFFF0" stroke="#F6E05E" strokeOpacity="0.5" />
-                    <text x={10} y={20} className="text-sm font-bold fill-current text-yellow-700">Question Marks</text>
+          <text
+            x={MATRIX_START + (HALF_MATRIX_SIZE * 0.5)}
+            y={MATRIX_START - 15}
+            textAnchor="middle"
+            className="text-[14px] font-bold fill-gray-600"
+          >
+            ← LOW SHARE
+          </text>
+          <text
+            x={MATRIX_START + (HALF_MATRIX_SIZE * 1.5)}
+            y={MATRIX_START - 15}
+            textAnchor="middle"
+            className="text-[14px] font-bold fill-gray-600"
+          >
+            HIGH SHARE →
+          </text>
+          <text
+            x={verticalLabelX}
+            y={MATRIX_START + (HALF_MATRIX_SIZE * 0.5)}
+            textAnchor="middle"
+            transform={`rotate(-90 ${verticalLabelX} ${
+              MATRIX_START + HALF_MATRIX_SIZE * 0.5
+            })`}
+            className="text-[14px] font-bold fill-gray-600"
+          >
+            HIGH GROWTH →
+          </text>
+          <text
+            x={verticalLabelX}
+            y={MATRIX_START + (HALF_MATRIX_SIZE * 1.5)}
+            textAnchor="middle"
+            transform={`rotate(-90 ${verticalLabelX} ${
+              MATRIX_START + HALF_MATRIX_SIZE * 1.5
+            })`}
+            className="text-[14px] font-bold fill-gray-600"
+          >
+            ← LOW GROWTH
+          </text>
+          <text
+            x={SIZE / 2}
+            y={SIZE - 10}
+            textAnchor="middle"
+            className="text-[16px] font-bold fill-gray-800"
+          >
+            Relative Market Share (Market Share %)
+          </text>
+          <text
+            x={AXIS_LABEL_SPACE / 2}
+            y={SIZE / 2}
+            textAnchor="middle"
+            transform={`rotate(-90 ${AXIS_LABEL_SPACE / 2} ${SIZE / 2})`}
+            className="text-[16px] font-bold fill-gray-800"
+          >
+            Market Growth Rate (Category Growth %)
+          </text>
+        </svg>
+      </div>
 
-                    {/* Dogs (Bottom Left) */}
-                    <rect x={0} y={half} width={half} height={half} fill="#FFF5F5" stroke="#F56565" strokeOpacity="0.5" />
-                    <text x={10} y={half + 20} className="text-sm font-bold fill-current text-red-700">Dogs</text>
-
-                    {/* --- Axes Lines --- */}
-                    <line x1={0} y1={half} x2={size} y2={half} stroke="#CBD5E0" strokeWidth="1" />
-                    <line x1={half} y1={0} x2={half} y2={size} stroke="#CBD5E0" strokeWidth="1" />
-
-                    {/* --- Data Bubbles --- */}
-                    {items.map((item, index) => {
-                        // --- SCALING FIX IMPLEMENTED HERE ---
-                        const PADDING = MAX_BUBBLE_RADIUS; 
-                        const DRAWABLE_SIZE = size - (2 * PADDING);
-
-                        // X-axis: Relative Market Share (0 to 100). Higher share is further right.
-                        // Scale x from [0, 100] to [PADDING, PADDING + DRAWABLE_SIZE].
-                        const scaledX = PADDING + ((item.x / 100) * DRAWABLE_SIZE);
-
-                        // Y-axis: Market Growth Rate (0 to 100). Higher growth is further up. (Inverted for SVG)
-                        // Scale y from [0, 100] to [size - PADDING, PADDING].
-                        const scaledY = size - PADDING - ((item.y / 100) * DRAWABLE_SIZE);
-
-                        // Bubble Radius: Based on the item's revenue (absolute size)
-                        const radius = Math.sqrt(item.revenue / maxBubbleBase) * MAX_BUBBLE_RADIUS;
-                        
-                        // Check if the current item is the selected item for dynamic highlighting
-                        // IMPORTANT: Check against the new 'id' property
-                        const isSelected = item.id === selectedId;
-
-                        return (
-                            <g key={index}>
-                                {/* Bubble element - Now with an onClick handler! */}
-                                <circle
-                                    cx={scaledX}
-                                    cy={scaledY}
-                                    r={radius}
-                                    fill={quadrantColors[item.classification]}
-                                    fillOpacity="0.75"
-                                    stroke={isSelected ? "#3182CE" : "#A0AEC0"}
-                                    strokeWidth={isSelected ? 4 : 1}
-                                    className="cursor-pointer transition-all duration-300 hover:fill-opacity-100 hover:ring-2 hover:ring-indigo-400"
-                                    onClick={() => onSelect(item)} // *** CLICK HANDLER ADDED HERE ***
-                                >
-                                    {/* Tooltip on hover */}
-                                    <title>{`${item.name} (${item.classification})\nShare: ${item.x.toFixed(1)}%\nGrowth: ${item.y.toFixed(1)}%\nRevenue: $${item.revenue.toLocaleString()}`}</title>
-                                </circle>
-
-                                {/* Optional: Add text label next to the bubble (only for selected items for clean design) */}
-                                {isSelected && (
-                                    <text 
-                                        x={scaledX + radius + 3} 
-                                        y={scaledY + 5} 
-                                        fontSize="10" 
-                                        fontWeight="bold"
-                                        fill="#3182CE"
-                                    >
-                                        {item.name}
-                                    </text>
-                                )}
-                            </g>
-                        );
-                    })}
-
-                    {/* --- X-Axis Label (Bottom) --- */}
-                    <text x={half} y={size + 30} textAnchor="middle" fontSize="12" fill="#4A5568">
-                        Relative Market Share (Revenue %)
-                    </text>
-
-                    {/* --- Y-Axis Label (Left) --- */}
-                    <text x={-20} y={half} textAnchor="middle" transform={`rotate(-90 ${-20} ${half})`} fontSize="12" fill="#4A5568">
-                        Market Growth Rate (Volume %)
-                    </text>
-                    
-                </svg>
+      <div className="mt-8 pt-4 border-t border-gray-100">
+        <p className="text-xl text-gray-700 mb-4 font-bold text-center">
+          Strategic Quadrants
+        </p>
+        <div className="grid grid-cols-2 sm:flex sm:justify-center gap-4 text-sm">
+          {Object.entries(COLOR_MAP).map(([name, data]) => (
+            <div
+              key={name}
+              className={`flex items-center space-x-2 p-2 px-4 rounded-full border-2 ${data.border} shadow-inner font-semibold`}
+              style={{ backgroundColor: data.bg_quadrant }}
+            >
+              <span
+                style={{ backgroundColor: data.fill }}
+                className="w-4 h-4 rounded-full opacity-85 shadow-md ring-1 ring-white"
+              ></span>
+              <span className="text-gray-800">{name}</span>
             </div>
-
-            {/* --- Legend --- */}
-            <div className="mt-8 pt-4 border-t border-gray-200">
-                <p className="text-sm text-gray-600 mb-2 font-semibold">Legend:</p>
-                <div className="flex justify-center space-x-6 text-sm">
-                    {Object.entries(quadrantColors).map(([name, color]) => (
-                        <div key={name} className="flex items-center space-x-2">
-                            <span style={{ backgroundColor: color }} className="w-3 h-3 rounded-full opacity-75"></span>
-                            <span className="text-gray-700">{name}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
+          ))}
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default MatrixChart;

@@ -1,8 +1,9 @@
-import "./globals.css";
+import './globals.css';
 
 export const metadata = {
-  title: "BCGmarketing",
-  description: "Cafe menu BCG Matrix powered by static data"
+  title: 'BCG Marketing Dashboard',
+  description:
+    'A dynamic marketing dashboard built with React and the BCG Matrix framework.',
 };
 
 export default function RootLayout({ children }) {
